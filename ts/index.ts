@@ -1,6 +1,15 @@
+
+import { Task } from './class/Task.js'
+import { Todos } from './class/Todos.js'
+
+
+const BACKEND_ROOT_URL = 'http://localhost:3001';
+const todos = new Todos(BACKEND_ROOT_URL);
 const list = <any>document.querySelector('#todolist');
 const input = <any>document.querySelector('#newtodo'); // ?
-const BACKEND_ROOT_URL = 'http://localhost:3001';
+
+
+
 input.addEventListener('keypress', (event: { key: string; preventDefault: () => void; }) => {
     if (event.key === "Enter") {
         event.preventDefault()
@@ -47,3 +56,5 @@ fetch(BACKEND_ROOT_URL)
     }, (error) => {
         alert(error);
     });
+    // creating a new Task
+ 
