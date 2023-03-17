@@ -1,16 +1,6 @@
-import { resolve } from "path"
-import { Task } from "./Task.js"
-import { rejects } from "assert"
 
-const mongoose = require("mongoose");
-const TodoSchema = new mongoose.Schema({
-    todo: {
-       type: String,
-       required:true,
-    },
-}  
-)
-module.exports = new mongoose.model('Todo', TodoSchema)
+import { Task } from "./Task.js"
+
 class Todos {
     task: Array<Task> = []
     #backend_url = ''
@@ -25,6 +15,7 @@ class Todos {
             fetch(this.#backend_url)
                 .then(response => response.json())
                 .then((response) => {
+                    this.#readJson(response)
                     resolve(this.tasks)
                 }, (error) => {
                     reject(error)
@@ -34,7 +25,7 @@ class Todos {
 
     // private method for reading JSON into array of tasks
     #readJson(taskAsJson: any): void {
-        taskAsJson.forEach(node => {
+        taskAsJson.forEach((node: any)  => {
             const task = new Task(node.id, node.description)
             this.tasks.push(task)
         })

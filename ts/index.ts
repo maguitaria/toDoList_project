@@ -1,14 +1,42 @@
-
-import { Task } from './class/Task.js'
-import { Todos } from './class/Todos.js'
+import { Task } from './Task.js'
+import { Todos } from './Todos.js'
 
 
 const BACKEND_ROOT_URL = 'http://localhost:3001';
+
+const list = <HTMLUListElement>document.querySelector('#todolist');
+const input = <HTMLUListElement>document.querySelector('#newtodo'); // ?
 const todos = new Todos(BACKEND_ROOT_URL);
-const list = <any>document.querySelector('#todolist');
-const input = <any>document.querySelector('#newtodo'); // ?
+input.disabled = true
 
+// fetch data from backend my making an HTTP call
 
+fetch(BACKEND_ROOT_URL)
+    .then(response => response.json())
+    .then((response) => {
+        response.forEach((node: { description: string; }) => {
+            renderTask(node.description)
+        });
+        input.disabled = false
+    }, (error) => {
+        alert(error);
+    });
+    
+const renderTask = (task: Task) => {
+    const list_item = document.createElement('li');
+    list_item.setAttribute('class', 'list-group-item');
+    list_item.innerHTML = task.text;
+    list.append(list_item);
+}
+
+todos.getTasks().then((tasks: Array<Task>)=> {
+    tasks.forEach(task => {
+        renderTask(task)
+    })
+    input.disabled = false
+}).catch((error: Error) => {
+    alert(error)
+});
 
 input.addEventListener('keypress', (event: { key: string; preventDefault: () => void; }) => {
     if (event.key === "Enter") {
@@ -37,24 +65,6 @@ input.addEventListener('keypress', (event: { key: string; preventDefault: () => 
     }
 })
 
-const renderTask = (text: string) => {
-    const list_item = document.createElement('li');
-    list_item.setAttribute('class', 'list-group-item');
-    list_item.innerHTML = text;
-    list.append(list_item);
-}
 
-// fetch data from backend my making an HTTP call
-input.disabled = true; // user can`t make an input during rendering
-fetch(BACKEND_ROOT_URL)
-    .then(response => response.json())
-    .then((response) => {
-        response.forEach((node: { description: string; }) => {
-            renderTask(node.description)
-        });
-        input.disabled = false
-    }, (error) => {
-        alert(error);
-    });
-    // creating a new Task
- 
+
+

@@ -11,43 +11,39 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 const port = 3001;
-const mongoose = require('mongoose');
 // server configuration
 app.listen(port, () => {
     console.log('Server is working on port ' + port);
 });
-// Receive value from client and insert input to database
-app.post('/new', (req, res) => {
-    const pool = openDb();
-    pool.query('insert into task (description) values ($1) returning *', [req.body.description], (error, result) => {
-        if (error) {
-            res.status(500).json({ error: error.message });
-        }
-        res.status(200).json({ id: result.rows[0].id });
-    });
-});
-app.get('/', (req, res) => {
-    const pool = openDb();
-    pool.query('select * from task', (error, result) => {
-        if (error) {
-            console.log(error);
-            res.status(500).json({ error: error.message });
-        }
-        console.log(result);
-        res.status(200).json(result.rows); // gives an error here
-    });
-});
+// routes
 const openDb = () => {
     const pool = new pg_1.Pool({
         user: 'postgres',
         host: 'localhost',
         database: 'todo',
         password: '1234567890',
-        port: 5342
+        port: 5432,
+        max: 20,
     });
     return pool;
 };
-// set EJS
-// app.set('view engine', 'ejs');
-// var todos = ['buy the milk', 'rent a car', 'feed the cat'];
-// app.get('/list', (request, response) => response.status(200).json(todos));
+const pool = openDb();
+// Receive value from client and insert input to database
+app.post('/new', (req, res) => {
+    pool.query('insert into task (description) values ($1) returning *', [req.body.description], (error, result) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+        return res.status(200).json({ id: result.rows[0].id });
+    });
+});
+app.get('/', (req, res) => {
+    pool.query('select * from task', (error, result) => {
+        if (error) {
+            console.log(error);
+            return res.status(500).json({ error: error.message });
+        }
+        console.log(result);
+        return res.status(200).json(result.rows); // gives an error here
+    });
+});
